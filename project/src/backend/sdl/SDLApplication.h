@@ -26,6 +26,8 @@ namespace lime {
 			virtual void Init ();
 			virtual int Quit ();
 			virtual bool Update ();
+
+			void PostVSync ();
 			
 			#ifdef EMSCRIPTEN
 			static SDLApplication *currentApplication;
@@ -39,8 +41,9 @@ namespace lime {
 			void ProcessMouseEvent (SDL_Event* event);
 			void ProcessTouchEvent (SDL_Event* event);
 			void ProcessWindowEvent (SDL_Event* event);
-			
+
 			bool active;
+			bool rendering;
 			Uint32 currentUpdate;
 			double framePeriod;
 			KeyEvent keyEvent;
@@ -51,6 +54,7 @@ namespace lime {
 			TouchEvent touchEvent;
 			UpdateEvent updateEvent;
 			WindowEvent windowEvent;
+			SDL_sem *vsyncDone;
 		
 	};
 	

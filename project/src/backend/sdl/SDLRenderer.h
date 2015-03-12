@@ -17,9 +17,15 @@ namespace lime {
 			~SDLRenderer ();
 			
 			virtual void Flip ();
+
+			void MakeCurrent ();
 			
 			SDL_Renderer* sdlRenderer;
 			SDL_Window* sdlWindow;
+			SDL_GLContext glContext;
+			SDL_sem *vsyncStart;
+
+			void VSyncThread ();
 		
 	};
 	

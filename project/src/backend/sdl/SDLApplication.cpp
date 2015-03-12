@@ -1,4 +1,5 @@
 #include "SDLApplication.h"
+#include "SDLRenderer.h"
 
 #ifdef HX_MACOS
 #include <CoreFoundation/CoreFoundation.h>
@@ -96,6 +97,9 @@ namespace lime {
 		switch (event->type) {
 			
 			case SDL_USEREVENT:
+
+				rendering = true;
+				((SDLRenderer *)event->user.data1)->MakeCurrent ();
 				
 				currentUpdate = SDL_GetTicks ();
 				updateEvent.deltaTime = currentUpdate - lastUpdate;
@@ -151,12 +155,14 @@ namespace lime {
 					
 					case SDL_WINDOWEVENT_EXPOSED: 
 						
+						rendering = true;
 						RenderEvent::Dispatch (&renderEvent);
 						break;
 					
 					case SDL_WINDOWEVENT_SIZE_CHANGED:
 						
 						ProcessWindowEvent (event);
+						rendering = true;
 						RenderEvent::Dispatch (&renderEvent);
 						break;
 					
@@ -185,8 +191,11 @@ namespace lime {
 		
 		framePeriod = 1000.0 / 60.0;
 		active = true;
+		rendering = false;
 		lastUpdate = SDL_GetTicks ();
 		nextUpdate = lastUpdate;
+
+		vsyncDone = SDL_CreateSemaphore (0);
 		
 	}
 	
@@ -331,7 +340,7 @@ namespace lime {
 		
 		#ifndef EMSCRIPTEN
 		
-		if (active && (firstTime || SDL_WaitEvent (&event))) {
+		if (active && (firstTime || SDL_PollEvent (&event))) {
 			
 			firstTime = false;
 			
@@ -340,13 +349,21 @@ namespace lime {
 			if (!active)
 				return active;
 			
-			if (SDL_PollEvent (&event)) {
+			while (active && SDL_PollEvent (&event)) {
 				
 				HandleEvent (&event);
 				event.type = -1;
 				
 			}
-			
+
+			if (rendering) {
+				
+				SDL_SemWait (vsyncDone);
+				rendering = false;
+
+			}
+
+			/*
 			currentUpdate = SDL_GetTicks ();
 			
 			if (currentUpdate >= nextUpdate) {
@@ -357,9 +374,11 @@ namespace lime {
 			} else if (!timerActive) {
 				
 				timerActive = true;
-				timerID = SDL_AddTimer (nextUpdate - currentUpdate, OnTimer, 0);
+				uint32_t interval = (nextUpdate - currentUpdate) / 10;
+				timerID = SDL_AddTimer (interval * 10, OnTimer, 0);
 				
 			}
+			*/
 			
 		}
 		
@@ -380,6 +399,13 @@ namespace lime {
 		
 		return active;
 		
+	}
+
+
+	void SDLApplication::PostVSync () {
+
+		SDL_SemPost (vsyncDone);
+
 	}
 	
 	
