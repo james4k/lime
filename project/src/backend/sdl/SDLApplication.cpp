@@ -98,7 +98,7 @@ namespace lime {
 			
 			case SDL_USEREVENT:
 
-				rendering = true;
+				rendering++;
 				((SDLRenderer *)event->user.data1)->MakeCurrent ();
 				
 				currentUpdate = SDL_GetTicks ();
@@ -155,14 +155,14 @@ namespace lime {
 					
 					case SDL_WINDOWEVENT_EXPOSED: 
 						
-						rendering = true;
+						rendering++;
 						RenderEvent::Dispatch (&renderEvent);
 						break;
 					
 					case SDL_WINDOWEVENT_SIZE_CHANGED:
 						
 						ProcessWindowEvent (event);
-						rendering = true;
+						rendering++;
 						RenderEvent::Dispatch (&renderEvent);
 						break;
 					
@@ -191,7 +191,7 @@ namespace lime {
 		
 		framePeriod = 1000.0 / 60.0;
 		active = true;
-		rendering = false;
+		rendering = 0;
 		lastUpdate = SDL_GetTicks ();
 		nextUpdate = lastUpdate;
 
@@ -356,10 +356,10 @@ namespace lime {
 				
 			}
 
-			if (rendering) {
+			while (rendering > 0) {
 				
 				SDL_SemWait (vsyncDone);
-				rendering = false;
+				rendering--;
 
 			}
 

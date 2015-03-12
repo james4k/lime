@@ -43,7 +43,7 @@ namespace lime {
 			void ProcessWindowEvent (SDL_Event* event);
 
 			bool active;
-			bool rendering;
+			int rendering;
 			Uint32 currentUpdate;
 			double framePeriod;
 			KeyEvent keyEvent;
