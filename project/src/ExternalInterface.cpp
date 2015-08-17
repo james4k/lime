@@ -1300,8 +1300,16 @@ namespace lime {
 }
 
 
+#ifdef LIME_CAIRO
+extern "C" int lime_cairo_register_prims ();
+#endif
+
+
 extern "C" int lime_register_prims () {
 	
-	return 0;
-	
+	return 0
+#ifdef LIME_CAIRO
+		+ lime_cairo_register_prims ()
+#endif
+		;
 }
