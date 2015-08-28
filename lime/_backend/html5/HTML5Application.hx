@@ -106,18 +106,7 @@ class HTML5Application {
 	
 	public function create (config:Config):Void {
 		
-		parent.config = config;
 		
-		if (config != null) {
-			
-			setFrameRate (config.fps);
-			var window = new Window (config);
-			var renderer = new Renderer (window);
-			parent.addWindow (window);
-			parent.addRenderer (renderer);
-			parent.init (renderer.context);
-			
-		}
 		
 	}
 	
@@ -141,10 +130,9 @@ class HTML5Application {
 		untyped __js__ ("
 			var lastTime = 0;
 			var vendors = ['ms', 'moz', 'webkit', 'o'];
-			for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+			for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
 				window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-				window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
-										   || window[vendors[x]+'CancelRequestAnimationFrame'];
+				window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
 			}
 			
 			if (!window.requestAnimationFrame)
@@ -167,9 +155,16 @@ class HTML5Application {
 		
 		lastUpdate = Date.now ().getTime ();
 		
-		handleUpdateEvent ();
+		handleApplicationEvent ();
 		
 		return 0;
+		
+	}
+	
+	
+	public function exit ():Void {
+		
+		
 		
 	}
 	
@@ -193,38 +188,7 @@ class HTML5Application {
 	}
 	
 	
-	private function handleKeyEvent (event:KeyboardEvent):Void {
-		
-		if (parent.window != null) {
-			
-			// space and arrow keys
-			
-			switch (event.keyCode) {
-				
-				case 32, 37, 38, 39, 40: event.preventDefault ();
-				
-			}
-			
-			var keyCode = cast convertKeyCode (event.keyCode != null ? event.keyCode : event.which);
-			var modifier = (event.shiftKey ? (KeyModifier.SHIFT) : 0) | (event.ctrlKey ? (KeyModifier.CTRL) : 0) | (event.altKey ? (KeyModifier.ALT) : 0) | (event.metaKey ? (KeyModifier.META) : 0);
-			
-			if (event.type == "keydown") {
-				
-				parent.window.onKeyDown.dispatch (keyCode, modifier);
-				
-			} else {
-				
-				parent.window.onKeyUp.dispatch (keyCode, modifier);
-				
-			}
-			
-		}
-		
-		
-	}
-	
-	
-	private function handleUpdateEvent (?__):Void {
+	private function handleApplicationEvent (?__):Void {
 		
 		currentUpdate = Date.now ().getTime ();
 		
@@ -240,7 +204,7 @@ class HTML5Application {
 			
 			if (parent.renderer != null) {
 				
-				parent.renderer.onRender.dispatch (parent.renderer.context);
+				parent.renderer.onRender.dispatch ();
 				parent.renderer.flip ();
 				
 			}
@@ -271,7 +235,37 @@ class HTML5Application {
 			
 		}
 		
-		Browser.window.requestAnimationFrame (cast handleUpdateEvent);
+		Browser.window.requestAnimationFrame (cast handleApplicationEvent);
+		
+	}
+	
+	
+	private function handleKeyEvent (event:KeyboardEvent):Void {
+		
+		if (parent.window != null) {
+			
+			// space and arrow keys
+			
+			// switch (event.keyCode) {
+				
+			// 	case 32, 37, 38, 39, 40: event.preventDefault ();
+				
+			// }
+			
+			var keyCode = cast convertKeyCode (event.keyCode != null ? event.keyCode : event.which);
+			var modifier = (event.shiftKey ? (KeyModifier.SHIFT) : 0) | (event.ctrlKey ? (KeyModifier.CTRL) : 0) | (event.altKey ? (KeyModifier.ALT) : 0) | (event.metaKey ? (KeyModifier.META) : 0);
+			
+			if (event.type == "keydown") {
+				
+				parent.window.onKeyDown.dispatch (keyCode, modifier);
+				
+			} else {
+				
+				parent.window.onKeyUp.dispatch (keyCode, modifier);
+				
+			}
+			
+		}
 		
 	}
 	
@@ -284,13 +278,13 @@ class HTML5Application {
 				
 				case "focus":
 					
-					parent.window.onWindowFocusIn.dispatch ();
-					parent.window.onWindowActivate.dispatch ();
+					parent.window.onFocusIn.dispatch ();
+					parent.window.onActivate.dispatch ();
 				
 				case "blur":
 					
-					parent.window.onWindowFocusOut.dispatch ();
-					parent.window.onWindowDeactivate.dispatch ();
+					parent.window.onFocusOut.dispatch ();
+					parent.window.onDeactivate.dispatch ();
 				
 				case "resize":
 					
@@ -301,13 +295,13 @@ class HTML5Application {
 					
 					if (parent.window.width != cacheWidth || parent.window.height != cacheHeight) {
 						
-						parent.window.onWindowResize.dispatch (parent.window.width, parent.window.height);
+						parent.window.onResize.dispatch (parent.window.width, parent.window.height);
 						
 					}
 				
 				case "beforeunload":
 					
-					parent.window.onWindowClose.dispatch ();
+					parent.window.onClose.dispatch ();
 				
 			}
 			
