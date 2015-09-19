@@ -9,7 +9,10 @@ import lime.graphics.CairoRenderContext;
 import lime.graphics.ConsoleRenderContext;
 import lime.graphics.GLRenderContext;
 import lime.graphics.Renderer;
-import lime.system.System;
+
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
 
 @:access(lime.ui.Window)
 
@@ -38,6 +41,7 @@ class NativeRenderer {
 	
 	public function create ():Void {
 		
+		#if !macro
 		handle = lime_renderer_create (parent.window.backend.handle);
 		
 		#if lime_console
@@ -47,7 +51,7 @@ class NativeRenderer {
 		
 		#else
 		
-		var type = lime_renderer_get_type (handle);
+		var type:String = lime_renderer_get_type (handle);
 		
 		switch (type) {
 			
@@ -70,6 +74,7 @@ class NativeRenderer {
 		}
 		
 		#end
+		#end
 		
 	}
 	
@@ -83,6 +88,7 @@ class NativeRenderer {
 	
 	public function flip ():Void {
 		
+		#if !macro
 		if (!useHardware) {
 			
 			#if lime_cairo
@@ -97,18 +103,20 @@ class NativeRenderer {
 		}
 		
 		lime_renderer_flip (handle);
+		#end
 		
 	}
 	
 	
 	public function render ():Void {
 		
+		#if !macro
 		lime_renderer_make_current (handle);
 		
 		if (!useHardware) {
 			
 			#if lime_cairo
-			var lock = lime_renderer_lock (handle);
+			var lock:Dynamic = lime_renderer_lock (handle);
 			
 			if (cacheLock == null || cacheLock.pixels != lock.pixels || cacheLock.width != lock.width || cacheLock.height != lock.height) {
 				
@@ -138,6 +146,7 @@ class NativeRenderer {
 			#end
 			
 		}
+		#end
 		
 	}
 	
@@ -149,13 +158,15 @@ class NativeRenderer {
 	
 	
 	
-	private static var lime_renderer_create = System.load ("lime", "lime_renderer_create", 1);
-	private static var lime_renderer_flip = System.load ("lime", "lime_renderer_flip", 1);
-	private static var lime_renderer_get_context = System.load ("lime", "lime_renderer_get_context", 1);
-	private static var lime_renderer_get_type = System.load ("lime", "lime_renderer_get_type", 1);
-	private static var lime_renderer_lock = System.load ("lime", "lime_renderer_lock", 1);
-	private static var lime_renderer_make_current = System.load ("lime", "lime_renderer_make_current", 1);
-	private static var lime_renderer_unlock = System.load ("lime", "lime_renderer_unlock", 1);
+	#if !macro
+	@:cffi private static function lime_renderer_create (window:Float):Float;
+	@:cffi private static function lime_renderer_flip (handle:Float):Void;
+	@:cffi private static function lime_renderer_get_context (handle:Float):Float;
+	@:cffi private static function lime_renderer_get_type (handle:Float):Dynamic;
+	@:cffi private static function lime_renderer_lock (handle:Float):Dynamic;
+	@:cffi private static function lime_renderer_make_current (handle:Float):Void;
+	@:cffi private static function lime_renderer_unlock (handle:Float):Void;
+	#end
 	
 	
 }

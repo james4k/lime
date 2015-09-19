@@ -12,15 +12,22 @@ import lime.graphics.Renderer;
 import lime.math.Rectangle;
 import lime.system.Display;
 import lime.system.DisplayMode;
+import lime.system.Sensor;
+import lime.system.SensorType;
 import lime.system.System;
 import lime.ui.Gamepad;
 import lime.ui.Touch;
 import lime.ui.Window;
 
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
+
 @:access(haxe.Timer)
 @:access(lime._backend.native.NativeRenderer)
 @:access(lime.app.Application)
 @:access(lime.graphics.Renderer)
+@:access(lime.system.Sensor)
 @:access(lime.ui.Gamepad)
 @:access(lime.ui.Window)
 
@@ -34,6 +41,7 @@ class NativeApplication {
 	private var keyEventInfo = new KeyEventInfo ();
 	private var mouseEventInfo = new MouseEventInfo ();
 	private var renderEventInfo = new RenderEventInfo (RENDER);
+	private var sensorEventInfo = new SensorEventInfo ();
 	private var textEventInfo = new TextEventInfo ();
 	private var touchEventInfo = new TouchEventInfo ();
 	private var unusedTouchesPool = new List<Touch> ();
@@ -52,17 +60,25 @@ class NativeApplication {
 		
 		AudioManager.init ();
 		
+		#if (ios || android)
+		Sensor.registerSensor (SensorType.ACCELEROMETER, 0);
+		#end
+		
 	}
 	
 	
 	public function create (config:Config):Void {
 		
-		handle = lime_application_create (null);
+		#if !macro
+		handle = lime_application_create ( { } );
+		#end
 		
 	}
 	
 	
 	public function exec ():Int {
+		
+		#if !macro
 		
 		lime_application_event_manager_register (handleApplicationEvent, applicationEventInfo);
 		lime_gamepad_event_manager_register (handleGamepadEvent, gamepadEventInfo);
@@ -72,6 +88,10 @@ class NativeApplication {
 		lime_text_event_manager_register (handleTextEvent, textEventInfo);
 		lime_touch_event_manager_register (handleTouchEvent, touchEventInfo);
 		lime_window_event_manager_register (handleWindowEvent, windowEventInfo);
+		
+		#if (ios || android)
+		lime_sensor_event_manager_register (handleSensorEvent, sensorEventInfo);
+		#end
 		
 		#if nodejs
 		
@@ -102,11 +122,10 @@ class NativeApplication {
 		
 		return result;
 		
-		#else
+		#end
+		#end
 		
 		return 0;
-		
-		#end
 		
 	}
 	
@@ -285,6 +304,19 @@ class NativeApplication {
 	}
 	
 	
+	private function handleSensorEvent ():Void {
+		
+		var sensor = Sensor.sensorByID.get (sensorEventInfo.id);
+		
+		if (sensor != null) {
+			
+			sensor.onUpdate.dispatch (sensorEventInfo.x, sensorEventInfo.y, sensorEventInfo.z);
+			
+		}
+		
+	}
+	
+	
 	private function handleTextEvent ():Void {
 		
 		var window = parent.windowByID.get (textEventInfo.windowID);
@@ -449,7 +481,9 @@ class NativeApplication {
 	
 	public function setFrameRate (value:Float):Float {
 		
+		#if !macro
 		lime_application_set_frame_rate (handle, value);
+		#end
 		return frameRate = value;
 		
 	}
@@ -495,20 +529,23 @@ class NativeApplication {
 	}
 	
 	
-	private static var lime_application_create = System.load ("lime", "lime_application_create", 1);
-	private static var lime_application_event_manager_register = System.load ("lime", "lime_application_event_manager_register", 2);
-	private static var lime_application_exec = System.load ("lime", "lime_application_exec", 1);
-	private static var lime_application_init = System.load ("lime", "lime_application_init", 1);
-	private static var lime_application_set_frame_rate = System.load ("lime", "lime_application_set_frame_rate", 2);
-	private static var lime_application_update = System.load ("lime", "lime_application_update", 1);
-	private static var lime_application_quit = System.load ("lime", "lime_application_quit", 1);
-	private static var lime_gamepad_event_manager_register = System.load ("lime", "lime_gamepad_event_manager_register", 2);
-	private static var lime_key_event_manager_register = System.load ("lime", "lime_key_event_manager_register", 2);
-	private static var lime_mouse_event_manager_register = System.load ("lime", "lime_mouse_event_manager_register", 2);
-	private static var lime_render_event_manager_register = System.load ("lime", "lime_render_event_manager_register", 2);
-	private static var lime_text_event_manager_register = System.load ("lime", "lime_text_event_manager_register", 2);
-	private static var lime_touch_event_manager_register = System.load ("lime", "lime_touch_event_manager_register", 2);
-	private static var lime_window_event_manager_register = System.load ("lime", "lime_window_event_manager_register", 2);
+	#if !macro
+	@:cffi private static function lime_application_create (config:Dynamic):Float;
+	@:cffi private static function lime_application_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_application_exec (handle:Float):Int;
+	@:cffi private static function lime_application_init (handle:Float):Void;
+	@:cffi private static function lime_application_quit (handle:Float):Int;
+	@:cffi private static function lime_application_set_frame_rate (handle:Float, value:Float):Void;
+	@:cffi private static function lime_application_update (handle:Float):Bool;
+	@:cffi private static function lime_gamepad_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_key_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_mouse_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_render_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_sensor_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_text_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_touch_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_window_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	#end
 	
 	
 }
@@ -702,6 +739,44 @@ private class RenderEventInfo {
 	var RENDER = 0;
 	var RENDER_CONTEXT_LOST = 1;
 	var RENDER_CONTEXT_RESTORED = 2;
+	
+}
+
+
+private class SensorEventInfo {
+	
+	
+	public var id:Int;
+	public var x:Float;
+	public var y:Float;
+	public var z:Float;
+	public var type:SensorEventType;
+	
+	
+	public function new (type:SensorEventType = null, id:Int = 0, x:Float = 0, y:Float = 0, z:Float = 0) {
+		
+		this.type = type;
+		this.id = id;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		
+	}
+	
+	
+	public function clone ():SensorEventInfo {
+		
+		return new SensorEventInfo (type, id, x, y, z);
+		
+	}
+	
+	
+}
+
+
+@:enum private abstract SensorEventType(Int) {
+	
+	var ACCELEROMETER = 0;
 	
 }
 
