@@ -133,13 +133,10 @@ class Cairo {
 	}
 	
 	
-	@:finalizer public function destroy ():Void {
+	/*@:finalizer*/ public function destroy ():Void {
 		
 		#if (lime_cairo && !macro)
-		if (handle != null) {
-			lime_cairo_destroy (handle);
-			handle = null;
-		}
+		lime_cairo_destroy (handle);
 		#end
 		
 	}
