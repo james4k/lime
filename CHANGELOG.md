@@ -1,3 +1,29 @@
+2.6.4 (09/21/2015)
+------------------
+
+* Changed cURL bindings to use Bytes instead of String for callbacks
+* Fixed iOS support for CFFI prime (requires HXCPP update)
+* Reverted SDL2 version to fix regression in iOS window size
+* Disabled Cairo finalizer (for now) to resolve some crash problems
+* Reduced "unreachable code" warnings in Firefox
+* Fixed iOS multitouch behavior (legacy)
+
+
+2.6.3 (09/19/2015)
+------------------
+
+* Added initial support for CFFI-based finalizer callbacks
+* Added initial accelerometer support
+* Fixed an issue with erratic mouse values on Mac
+* Fixed a minor issue with touch events
+* Updated to a newer SDL development version
+* Improved the handling of alpha when using image.setPixel
+* Updated System.exit to go to background on Android if not an error
+* Improved dirty logic with Image pixel operations
+* Added an optimization for repeated Font path lookups
+* Improved support for non-US keyboard layouts (legacy)
+
+
 2.6.2 (09/08/2015)
 ------------------
 

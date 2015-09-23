@@ -31,7 +31,6 @@ class Cairo {
 	public var matrix (get, set):Matrix3;
 	public var miterLimit (get, set):Float;
 	public var operator (get, set):CairoOperator;
-	public var referenceCount (get, never):Int;
 	public var source (get, set):CairoPattern;
 	public var target (get, null):CairoSurface;
 	public var tolerance (get, set):Float;
@@ -50,14 +49,6 @@ class Cairo {
 			
 		}
 		
-	}
-	
-	public function recreate (surface:CairoSurface) : Void {
-		
-		#if (lime_cairo && !macro)
-		destroy ();
-		handle = lime_cairo_create (surface);
-		#end
 	}
 	
 	
@@ -128,15 +119,6 @@ class Cairo {
 		
 		#if (lime_cairo && !macro)
 		lime_cairo_curve_to (handle, x1, y1, x2, y2, x3, y3);
-		#end
-		
-	}
-	
-	
-	/*@:finalizer*/ public function destroy ():Void {
-		
-		#if (lime_cairo && !macro)
-		lime_cairo_destroy (handle);
 		#end
 		
 	}
@@ -312,19 +294,18 @@ class Cairo {
 	}
 	
 	
+	private function recreate (surface:CairoSurface):Void {
+		
+		#if (lime_cairo && !macro)
+		handle = lime_cairo_create (surface);
+		#end
+	}
+	
+	
 	public function rectangle (x:Float, y:Float, width:Float, height:Float):Void {
 		
 		#if (lime_cairo && !macro)
 		lime_cairo_rectangle (handle, x, y, width, height);
-		#end
-		
-	}
-	
-	
-	public function reference ():Void {
-		
-		#if (lime_cairo && !macro)
-		lime_cairo_reference (handle);
 		#end
 		
 	}
@@ -808,17 +789,6 @@ class Cairo {
 	}
 	
 	
-	@:noCompletion private function get_referenceCount ():Int {
-		
-		#if (lime_cairo && !macro)
-		return lime_cairo_get_reference_count (handle);
-		#else
-		return 0;
-		#end
-		
-	}
-	
-	
 	@:noCompletion private function get_source ():CairoPattern {
 		
 		#if (lime_cairo && !macro)
@@ -904,88 +874,85 @@ class Cairo {
 	
 	
 	#if (lime_cairo && !macro)
-	@:cffi private static function lime_cairo_arc (handle:Float, xc:Float, yc:Float, radius:Float, angle1:Float, angle2:Float):Void;
-	@:cffi private static function lime_cairo_arc_negative (handle:Float, xc:Float, yc:Float, radius:Float, angle1:Float, angle2:Float):Void;
-	@:cffi private static function lime_cairo_clip (handle:Float):Void;
-	@:cffi private static function lime_cairo_clip_preserve (handle:Float):Void;
-	@:cffi private static function lime_cairo_clip_extents (handle:Float, x1:Float, y1:Float, x2:Float, y2:Float):Void;
-	@:cffi private static function lime_cairo_close_path (handle:Float):Void;
-	@:cffi private static function lime_cairo_copy_page (handle:Float):Void;
-	@:cffi private static function lime_cairo_create (handle:Float):Float;
-	@:cffi private static function lime_cairo_curve_to (handle:Float, x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float):Void;
-	@:cffi private static function lime_cairo_destroy (handle:Float):Void;
-	@:cffi private static function lime_cairo_fill (handle:Float):Void;
-	@:cffi private static function lime_cairo_fill_extents (handle:Float, x1:Float, y1:Float, x2:Float, y2:Float):Void;
-	@:cffi private static function lime_cairo_fill_preserve (handle:Float):Void;
-	@:cffi private static function lime_cairo_get_antialias (handle:Float):Int;
-	@:cffi private static function lime_cairo_get_current_point (handle:Float):Dynamic;
-	@:cffi private static function lime_cairo_get_dash (handle:Float):Dynamic;
-	@:cffi private static function lime_cairo_get_dash_count (handle:Float):Int;
-	@:cffi private static function lime_cairo_get_fill_rule (handle:Float):Int;
-	@:cffi private static function lime_cairo_get_font_face (handle:Float):Float;
-	@:cffi private static function lime_cairo_get_font_options (handle:Float):Float;
-	@:cffi private static function lime_cairo_get_group_target (handle:Float):Float;
-	@:cffi private static function lime_cairo_get_line_cap (handle:Float):Int;
-	@:cffi private static function lime_cairo_get_line_join (handle:Float):Int;
-	@:cffi private static function lime_cairo_get_line_width (handle:Float):Float;
-	@:cffi private static function lime_cairo_get_matrix (handle:Float):Dynamic;
-	@:cffi private static function lime_cairo_get_miter_limit (handle:Float):Float;
-	@:cffi private static function lime_cairo_get_operator (handle:Float):Int;
-	@:cffi private static function lime_cairo_get_reference_count (handle:Float):Int;
-	@:cffi private static function lime_cairo_get_source (handle:Float):Float;
-	@:cffi private static function lime_cairo_get_target (handle:Float):Float;
-	@:cffi private static function lime_cairo_get_tolerance (handle:Float):Float;
-	@:cffi private static function lime_cairo_has_current_point (handle:Float):Bool;
-	@:cffi private static function lime_cairo_identity_matrix (handle:Float):Void;
-	@:cffi private static function lime_cairo_in_clip (handle:Float, x:Float, y:Float):Bool;
-	@:cffi private static function lime_cairo_in_fill (handle:Float, x:Float, y:Float):Bool;
-	@:cffi private static function lime_cairo_in_stroke (handle:Float, x:Float, y:Float):Bool;
-	@:cffi private static function lime_cairo_line_to (handle:Float, x:Float, y:Float):Void;
-	@:cffi private static function lime_cairo_mask (handle:Float, pattern:Float):Void;
-	@:cffi private static function lime_cairo_mask_surface (handle:Float, surface:Float, x:Float, y:Float):Void;
-	@:cffi private static function lime_cairo_move_to (handle:Float, x:Float, y:Float):Void;
-	@:cffi private static function lime_cairo_new_path (handle:Float):Void;
-	@:cffi private static function lime_cairo_paint (handle:Float):Void;
-	@:cffi private static function lime_cairo_paint_with_alpha (handle:Float, alpha:Float):Void;
-	@:cffi private static function lime_cairo_pop_group (handle:Float):Float;
-	@:cffi private static function lime_cairo_pop_group_to_source (handle:Float):Void;
-	@:cffi private static function lime_cairo_push_group (handle:Float):Void;
-	@:cffi private static function lime_cairo_push_group_with_content (handle:Float, content:Int):Void;
-	@:cffi private static function lime_cairo_rectangle (handle:Float, x:Float, y:Float, width:Float, height:Float):Void;
-	@:cffi private static function lime_cairo_reference (handle:Float):Void;
-	@:cffi private static function lime_cairo_rel_curve_to (handle:Float, dx1:Float, dy1:Float, dx2:Float, dy2:Float, dx3:Float, dy3:Float):Void;
-	@:cffi private static function lime_cairo_rel_line_to (handle:Float, dx:Float, dy:Float):Void;
-	@:cffi private static function lime_cairo_rel_move_to (handle:Float, dx:Float, dy:Float):Void;
-	@:cffi private static function lime_cairo_reset_clip (handle:Float):Void;
-	@:cffi private static function lime_cairo_restore (handle:Float):Void;
-	@:cffi private static function lime_cairo_rotate (handle:Float, amount:Float):Void;
-	@:cffi private static function lime_cairo_save (handle:Float):Void;
-	@:cffi private static function lime_cairo_scale (handle:Float, x:Float, y:Float):Void;
-	@:cffi private static function lime_cairo_set_antialias (handle:Float, cap:Int):Void;
-	@:cffi private static function lime_cairo_set_dash (handle:Float, dash:Dynamic):Void;
-	@:cffi private static function lime_cairo_set_fill_rule (handle:Float, cap:Int):Void;
-	@:cffi private static function lime_cairo_set_font_face (handle:Float, face:Float):Void;
-	@:cffi private static function lime_cairo_set_font_options (handle:Float, options:Float):Void;
-	@:cffi private static function lime_cairo_set_font_size (handle:Float, size:Float):Void;
-	@:cffi private static function lime_cairo_set_line_cap (handle:Float, cap:Int):Void;
-	@:cffi private static function lime_cairo_set_line_join (handle:Float, join:Int):Void;
-	@:cffi private static function lime_cairo_set_line_width (handle:Float, width:Float):Void;
-	@:cffi private static function lime_cairo_set_matrix (handle:Float, matrix:Dynamic):Void;
-	@:cffi private static function lime_cairo_set_miter_limit (handle:Float, miterLimit:Float):Void;
-	@:cffi private static function lime_cairo_set_operator (handle:Float, op:Int):Void;
-	@:cffi private static function lime_cairo_set_source (handle:Float, pattern:Float):Void;
-	@:cffi private static function lime_cairo_set_source_rgb (handle:Float, r:Float, g:Float, b:Float):Void;
-	@:cffi private static function lime_cairo_set_source_rgba (handle:Float, r:Float, g:Float, b:Float, a:Float):Void;
-	@:cffi private static function lime_cairo_set_source_surface (handle:Float, surface:Float, x:Float, y:Float):Void;
-	@:cffi private static function lime_cairo_set_tolerance (handle:Float, tolerance:Float):Void;
-	@:cffi private static function lime_cairo_show_page (handle:Float):Void;
-	@:cffi private static function lime_cairo_show_text (handle:Float, text:String):Void;
-	@:cffi private static function lime_cairo_status (handle:Float):Int;
-	@:cffi private static function lime_cairo_stroke (handle:Float):Void;
-	@:cffi private static function lime_cairo_stroke_extents (handle:Float, x1:Float, y1:Float, x2:Float, y2:Float):Void;
-	@:cffi private static function lime_cairo_stroke_preserve (handle:Float):Void;
-	@:cffi private static function lime_cairo_transform (handle:Float, matrix:Dynamic):Void;
-	@:cffi private static function lime_cairo_translate (handle:Float, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_arc (handle:Dynamic, xc:Float, yc:Float, radius:Float, angle1:Float, angle2:Float):Void;
+	@:cffi private static function lime_cairo_arc_negative (handle:Dynamic, xc:Float, yc:Float, radius:Float, angle1:Float, angle2:Float):Void;
+	@:cffi private static function lime_cairo_clip (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_clip_preserve (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_clip_extents (handle:Dynamic, x1:Float, y1:Float, x2:Float, y2:Float):Void;
+	@:cffi private static function lime_cairo_close_path (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_copy_page (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_create (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_curve_to (handle:Dynamic, x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float):Void;
+	@:cffi private static function lime_cairo_fill (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_fill_extents (handle:Dynamic, x1:Float, y1:Float, x2:Float, y2:Float):Void;
+	@:cffi private static function lime_cairo_fill_preserve (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_get_antialias (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_get_current_point (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_get_dash (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_get_dash_count (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_get_fill_rule (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_get_font_face (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_get_font_options (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_get_group_target (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_get_line_cap (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_get_line_join (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_get_line_width (handle:Dynamic):Float;
+	@:cffi private static function lime_cairo_get_matrix (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_get_miter_limit (handle:Dynamic):Float;
+	@:cffi private static function lime_cairo_get_operator (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_get_source (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_get_target (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_get_tolerance (handle:Dynamic):Float;
+	@:cffi private static function lime_cairo_has_current_point (handle:Dynamic):Bool;
+	@:cffi private static function lime_cairo_identity_matrix (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_in_clip (handle:Dynamic, x:Float, y:Float):Bool;
+	@:cffi private static function lime_cairo_in_fill (handle:Dynamic, x:Float, y:Float):Bool;
+	@:cffi private static function lime_cairo_in_stroke (handle:Dynamic, x:Float, y:Float):Bool;
+	@:cffi private static function lime_cairo_line_to (handle:Dynamic, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_mask (handle:Dynamic, pattern:Dynamic):Void;
+	@:cffi private static function lime_cairo_mask_surface (handle:Dynamic, surface:Dynamic, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_move_to (handle:Dynamic, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_new_path (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_paint (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_paint_with_alpha (handle:Dynamic, alpha:Float):Void;
+	@:cffi private static function lime_cairo_pop_group (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_cairo_pop_group_to_source (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_push_group (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_push_group_with_content (handle:Dynamic, content:Int):Void;
+	@:cffi private static function lime_cairo_rectangle (handle:Dynamic, x:Float, y:Float, width:Float, height:Float):Void;
+	@:cffi private static function lime_cairo_rel_curve_to (handle:Dynamic, dx1:Float, dy1:Float, dx2:Float, dy2:Float, dx3:Float, dy3:Float):Void;
+	@:cffi private static function lime_cairo_rel_line_to (handle:Dynamic, dx:Float, dy:Float):Void;
+	@:cffi private static function lime_cairo_rel_move_to (handle:Dynamic, dx:Float, dy:Float):Void;
+	@:cffi private static function lime_cairo_reset_clip (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_restore (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_rotate (handle:Dynamic, amount:Float):Void;
+	@:cffi private static function lime_cairo_save (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_scale (handle:Dynamic, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_set_antialias (handle:Dynamic, cap:Int):Void;
+	@:cffi private static function lime_cairo_set_dash (handle:Dynamic, dash:Dynamic):Void;
+	@:cffi private static function lime_cairo_set_fill_rule (handle:Dynamic, cap:Int):Void;
+	@:cffi private static function lime_cairo_set_font_face (handle:Dynamic, face:Dynamic):Void;
+	@:cffi private static function lime_cairo_set_font_options (handle:Dynamic, options:Dynamic):Void;
+	@:cffi private static function lime_cairo_set_font_size (handle:Dynamic, size:Float):Void;
+	@:cffi private static function lime_cairo_set_line_cap (handle:Dynamic, cap:Int):Void;
+	@:cffi private static function lime_cairo_set_line_join (handle:Dynamic, join:Int):Void;
+	@:cffi private static function lime_cairo_set_line_width (handle:Dynamic, width:Float):Void;
+	@:cffi private static function lime_cairo_set_matrix (handle:Dynamic, matrix:Dynamic):Void;
+	@:cffi private static function lime_cairo_set_miter_limit (handle:Dynamic, miterLimit:Float):Void;
+	@:cffi private static function lime_cairo_set_operator (handle:Dynamic, op:Int):Void;
+	@:cffi private static function lime_cairo_set_source (handle:Dynamic, pattern:Dynamic):Void;
+	@:cffi private static function lime_cairo_set_source_rgb (handle:Dynamic, r:Float, g:Float, b:Float):Void;
+	@:cffi private static function lime_cairo_set_source_rgba (handle:Dynamic, r:Float, g:Float, b:Float, a:Float):Void;
+	@:cffi private static function lime_cairo_set_source_surface (handle:Dynamic, surface:Dynamic, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_set_tolerance (handle:Dynamic, tolerance:Float):Void;
+	@:cffi private static function lime_cairo_show_page (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_show_text (handle:Dynamic, text:String):Void;
+	@:cffi private static function lime_cairo_status (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_stroke (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_stroke_extents (handle:Dynamic, x1:Float, y1:Float, x2:Float, y2:Float):Void;
+	@:cffi private static function lime_cairo_stroke_preserve (handle:Dynamic):Void;
+	@:cffi private static function lime_cairo_transform (handle:Dynamic, matrix:Dynamic):Void;
+	@:cffi private static function lime_cairo_translate (handle:Dynamic, x:Float, y:Float):Void;
 	@:cffi private static function lime_cairo_version ():Int;
 	@:cffi private static function lime_cairo_version_string ():String;
 	#end

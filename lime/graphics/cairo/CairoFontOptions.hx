@@ -8,7 +8,7 @@ import lime.text.Font;
 #end
 
 
-abstract CairoFontOptions(Dynamic) from Float to Float {
+abstract CairoFontOptions(Dynamic) {
 	
 	
 	public var antialias (get, set):CairoAntialias;
@@ -22,16 +22,7 @@ abstract CairoFontOptions(Dynamic) from Float to Float {
 		#if (lime_cairo && !macro)
 		this = lime_cairo_font_options_create ();
 		#else
-		this = cast 0;
-		#end
-		
-	}
-	
-	
-	public function destroy ():Void {
-		
-		#if (lime_cairo && !macro)
-		lime_cairo_font_options_destroy (this);
+		this = null;
 		#end
 		
 	}
@@ -141,16 +132,15 @@ abstract CairoFontOptions(Dynamic) from Float to Float {
 	
 	
 	#if ((cpp || neko || nodejs) && !macro)
-	@:cffi private static function lime_cairo_font_options_create ():Float;
-	@:cffi private static function lime_cairo_font_options_destroy (handle:Float):Void;
-	@:cffi private static function lime_cairo_font_options_get_antialias (handle:Float):Int;
-	@:cffi private static function lime_cairo_font_options_get_hint_metrics (handle:Float):Int;
-	@:cffi private static function lime_cairo_font_options_get_hint_style (handle:Float):Int;
-	@:cffi private static function lime_cairo_font_options_get_subpixel_order (handle:Float):Int;
-	@:cffi private static function lime_cairo_font_options_set_antialias (handle:Float, v:Int):Void;
-	@:cffi private static function lime_cairo_font_options_set_hint_metrics (handle:Float, v:Int):Void;
-	@:cffi private static function lime_cairo_font_options_set_hint_style (handle:Float, v:Int):Void;
-	@:cffi private static function lime_cairo_font_options_set_subpixel_order (handle:Float, v:Int):Void;
+	@:cffi private static function lime_cairo_font_options_create ():Dynamic;
+	@:cffi private static function lime_cairo_font_options_get_antialias (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_font_options_get_hint_metrics (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_font_options_get_hint_style (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_font_options_get_subpixel_order (handle:Dynamic):Int;
+	@:cffi private static function lime_cairo_font_options_set_antialias (handle:Dynamic, v:Int):Void;
+	@:cffi private static function lime_cairo_font_options_set_hint_metrics (handle:Dynamic, v:Int):Void;
+	@:cffi private static function lime_cairo_font_options_set_hint_style (handle:Dynamic, v:Int):Void;
+	@:cffi private static function lime_cairo_font_options_set_subpixel_order (handle:Dynamic, v:Int):Void;
 	#end
 	
 	
