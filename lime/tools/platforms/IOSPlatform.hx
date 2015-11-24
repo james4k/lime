@@ -224,8 +224,9 @@ class IOSPlatform extends PlatformTarget {
 			context.OBJC_ARC = true;
 			
 		}
-		
-		context.ENABLE_BITCODE = (project.config.getFloat ("ios.deployment", 5.1) >= 6);
+
+		//context.ENABLE_BITCODE = (project.config.getFloat ("ios.deployment", 5.1) >= 6);
+		context.ENABLE_BITCODE = project.config.getBool ("ios.enable-bitcode", false);
 		context.IOS_COMPILER = project.config.getString ("ios.compiler", "clang");
 		context.CPP_BUILD_LIBRARY = project.config.getString ("cpp.buildLibrary", "hxcpp");
 		
@@ -328,6 +329,8 @@ class IOSPlatform extends PlatformTarget {
 		var i386 = (command == "rebuild" || project.targetFlags.exists ("simulator"));
 		var x86_64 = (command == "rebuild" || project.targetFlags.exists ("simulator"));
 		
+		var arc = (project.targetFlags.exists ("arc"));
+		
 		var commands = [];
 		
 		if (armv6) commands.push ([ "-Dios", "-DHXCPP_CPP11" ]);
@@ -336,6 +339,16 @@ class IOSPlatform extends PlatformTarget {
 		if (arm64) commands.push ([ "-Dios", "-DHXCPP_CPP11", "-DHXCPP_ARM64" ]);
 		if (i386) commands.push ([ "-Dios", "-Dsimulator", "-DHXCPP_CPP11" ]);
 		if (x86_64) commands.push ([ "-Dios", "-Dsimulator", "-DHXCPP_M64", "-DHXCPP_CPP11" ]);
+		
+		if (arc) {
+			
+			for (command in commands) {
+				
+				command.push ("-DOBJC_ARC");
+				
+			}
+			
+		}
 		
 		CPPHelper.rebuild (project, commands);
 		
@@ -354,6 +367,19 @@ class IOSPlatform extends PlatformTarget {
 	public override function update ():Void {
 		
 		project = project.clone ();
+		
+		for (asset in project.assets) {
+			
+			if (asset.embed && asset.sourcePath == "") {
+				
+				var path = PathHelper.combine (targetDirectory + "/" + project.app.file + "/obj/tmp", asset.targetPath);
+				PathHelper.mkdir (Path.directory (path));
+				FileHelper.copyAsset (asset, path);
+				asset.sourcePath = path;
+				
+			}
+			
+		}
 		
 		var manifest = new Asset ();
 		manifest.id = "__manifest__";

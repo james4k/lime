@@ -2,13 +2,13 @@ package lime.graphics.utils;
 
 
 import haxe.format.JsonParser;
+import haxe.io.Bytes;
 import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.graphics.PixelFormat;
 import lime.math.ColorMatrix;
 import lime.math.Rectangle;
 import lime.math.Vector2;
-import lime.utils.ByteArray;
 import lime.utils.UInt8Array;
 
 #if (js && html5)
@@ -51,6 +51,10 @@ class ImageCanvasUtil {
 			createCanvas (image, buffer.width, buffer.height);
 			createImageData (image);
 			
+		} else if (buffer.data == null && buffer.__srcImageData != null) {
+			
+			buffer.data = cast buffer.__srcImageData.data;
+			
 		}
 		
 	}
@@ -88,7 +92,7 @@ class ImageCanvasUtil {
 	
 	public static function copyPixels (image:Image, sourceImage:Image, sourceRect:Rectangle, destPoint:Vector2, alphaImage:Image = null, alphaPoint:Vector2 = null, mergeAlpha:Bool = false):Void {
 		
-		if (destPoint == null || destPoint.x >= image.width || destPoint.y >= image.height || sourceRect == null || sourceRect.width <= 0 || sourceRect.height <= 0) {
+		if (destPoint == null || destPoint.x >= image.width || destPoint.y >= image.height || sourceRect == null || sourceRect.width < 1 || sourceRect.height < 1) {
 			
 			return;
 			
@@ -260,7 +264,7 @@ class ImageCanvasUtil {
 	}
 	
 	
-	public static function getPixels (image:Image, rect:Rectangle, format:PixelFormat):ByteArray {
+	public static function getPixels (image:Image, rect:Rectangle, format:PixelFormat):Bytes {
 		
 		convertToCanvas (image);
 		createImageData (image);
@@ -337,12 +341,12 @@ class ImageCanvasUtil {
 	}
 	
 	
-	public static function setPixels (image:Image, rect:Rectangle, byteArray:ByteArray, format:PixelFormat):Void {
+	public static function setPixels (image:Image, rect:Rectangle, bytes:Bytes, format:PixelFormat):Void {
 		
 		convertToCanvas (image);
 		createImageData (image);
 		
-		ImageDataUtil.setPixels (image, rect, byteArray, format);
+		ImageDataUtil.setPixels (image, rect, bytes, format);
 		
 	}
 	

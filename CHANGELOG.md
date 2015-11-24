@@ -1,3 +1,65 @@
+2.7.0 (10/28/2015)
+------------------
+
+* Added a minimum version check for OpenGL (software fallback otherwise)
+* Improved the consistency of frame time on native platforms
+* Fixed an issue where Android applications would crash on unfound files
+* Updated the Neko template for Lime legacy builds
+
+
+2.6.9 (10/15/2015)
+------------------
+
+* Fixed an issue with certain predictive text keyboards on Android
+* Fixed an issue where ImageBuffer did not update after certain changes
+* Fixed a red tint that occurred on some mobile graphics
+* Fixed a crash on closing applications on OS X 10.11 due to OpenAL
+* Fixed an issue with VERIFY_HOST in the cURL bindings
+* Additional fixes for tvOS compatibility
+* Made minor template updates
+* Fixed the default virtual keyboard type on BlackBerry (legacy)
+
+
+2.6.8 (10/05/2015)
+------------------
+
+* Updated to a new SDL development version
+* Added window.scale, window size and mouse events are in points
+* Added Lime Joystick events (alongside Gamepad events)
+* Added JPEG and PNG encode support for HTML5
+* Improved tooling support for tvOS builds
+
+
+2.6.7 (10/02/2015)
+------------------
+
+* Added initial changes to support Apple tvOS
+* Added System.allowScreenTimeout to allow screensaver/sleep
+* Updated CFFI to fix "hx_register_prim" issue on Android
+* Improved "lime setup linux"
+* Fixed preload when the same asset is listed twice
+* Fixed an issue with importing lime.Assets in legacy builds
+
+
+2.6.6 (09/24/2015)
+------------------
+
+* Patch support for static C++ builds without use of HXCPP dev
+* Fixed a crash that could occur in Flixel 3.x
+
+
+2.6.5 (09/23/2015)
+------------------
+
+* Improved automatic garbage collection for native references
+* Removed Cairo reference/destroy (handled internally now)
+* Added lime.system.CFFIPointer
+* Added *.fla to default exclude asset filter
+* Disabled ENABLE_BITCODE on iOS by default
+* Fixed an issue with Image.fromBitmapData when using OpenFL
+* Fixed a minor issue with copyPixels on Firefox
+
+
 2.6.4 (09/21/2015)
 ------------------
 

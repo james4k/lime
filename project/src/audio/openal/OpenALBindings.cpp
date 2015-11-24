@@ -6,7 +6,9 @@
 #include "AL/alc.h"
 #endif
 
-#include <hx/CFFIPrime.h>
+#include <hx/CFFIPrimePatch.h>
+//#include <hx/CFFIPrime.h>
+#include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 
 
@@ -890,8 +892,7 @@ namespace lime {
 		int* list = val_array_int (attrlist);
 		
 		ALCcontext* alcContext = alcCreateContext (alcDevice, list);
-		
-		return cffi::alloc_pointer (alcContext);
+		return CFFIPointer (alcContext);
 		
 	}
 	
@@ -908,7 +909,7 @@ namespace lime {
 		
 		ALCcontext* alcContext = (ALCcontext*)val_data (context);
 		ALCdevice* alcDevice = alcGetContextsDevice (alcContext);
-		return cffi::alloc_pointer (alcDevice);
+		return CFFIPointer (alcDevice);
 		
 	}
 	
@@ -916,7 +917,7 @@ namespace lime {
 	value lime_alc_get_current_context () {
 		
 		ALCcontext* alcContext = alcGetCurrentContext ();
-		return cffi::alloc_pointer (alcContext);
+		return CFFIPointer (alcContext);
 		
 	}
 	
@@ -971,7 +972,7 @@ namespace lime {
 		
 		ALCdevice* alcDevice = alcOpenDevice (devicename.__s);
 		atexit (lime_al_cleanup);
-		return cffi::alloc_pointer (alcDevice);
+		return CFFIPointer (alcDevice);
 		
 	}
 	

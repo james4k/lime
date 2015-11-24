@@ -7,7 +7,8 @@
 #endif
 
 
-#include <hx/CFFIPrime.h>
+#include <hx/CFFIPrimePatch.h>
+//#include <hx/CFFIPrime.h>
 #include <app/Application.h>
 #include <app/ApplicationEvent.h>
 #include <audio/format/OGG.h>
@@ -20,6 +21,7 @@
 #include <graphics/ImageBuffer.h>
 #include <graphics/Renderer.h>
 #include <graphics/RenderEvent.h>
+#include <system/CFFIPointer.h>
 #include <system/Clipboard.h>
 #include <system/JNI.h>
 #include <system/SensorEvent.h>
@@ -29,6 +31,8 @@
 #include <ui/FileDialog.h>
 #include <ui/Gamepad.h>
 #include <ui/GamepadEvent.h>
+#include <ui/Joystick.h>
+#include <ui/JoystickEvent.h>
 #include <ui/KeyEvent.h>
 #include <ui/Mouse.h>
 #include <ui/MouseCursor.h>
@@ -94,9 +98,7 @@ namespace lime {
 		
 		Application* application = CreateApplication ();
 		Application::callback = new AutoGCRoot (callback);
-		value handle = cffi::alloc_pointer (application);
-		val_gc (handle, gc_application);
-		return handle;
+		return CFFIPointer (application, gc_application);
 		
 	}
 	
@@ -212,6 +214,13 @@ namespace lime {
 		
 		Bytes data = Bytes (path.__s);
 		return data.Value ();
+		
+	}
+	
+	
+	double lime_cffi_get_native_pointer (value handle) {
+		
+		return (intptr_t)val_data (handle);
 		
 	}
 	
@@ -457,9 +466,7 @@ namespace lime {
 			
 			if (font->face) {
 				
-				value handle = cffi::alloc_pointer (font);
-				val_gc (handle, gc_font);
-				return handle;
+				return CFFIPointer (font, gc_font);
 				
 			} else {
 				
@@ -779,6 +786,58 @@ namespace lime {
 	}
 	
 	
+	void lime_joystick_event_manager_register (value callback, value eventObject) {
+		
+		JoystickEvent::callback = new AutoGCRoot (callback);
+		JoystickEvent::eventObject = new AutoGCRoot (eventObject);
+		
+	}
+	
+	
+	value lime_joystick_get_device_guid (int id) {
+		
+		const char* guid = Joystick::GetDeviceGUID (id);
+		return guid ? alloc_string (guid) : alloc_null ();
+		
+	}
+	
+	
+	value lime_joystick_get_device_name (int id) {
+		
+		const char* name = Joystick::GetDeviceName (id);
+		return name ? alloc_string (name) : alloc_null ();
+		
+	}
+	
+	
+	int lime_joystick_get_num_axes (int id) {
+		
+		return Joystick::GetNumAxes (id);
+		
+	}
+	
+	
+	int lime_joystick_get_num_buttons (int id) {
+		
+		return Joystick::GetNumButtons (id);
+		
+	}
+	
+	
+	int lime_joystick_get_num_hats (int id) {
+		
+		return Joystick::GetNumHats (id);
+		
+	}
+	
+	
+	int lime_joystick_get_num_trackballs (int id) {
+		
+		return Joystick::GetNumTrackballs (id);
+		
+	}
+	
+	
 	value lime_jpeg_decode_bytes (value data, bool decodeData) {
 		
 		ImageBuffer imageBuffer;
@@ -966,9 +1025,7 @@ namespace lime {
 	value lime_renderer_create (value window) {
 		
 		Renderer* renderer = CreateRenderer ((Window*)val_data (window));
-		value handle = cffi::alloc_pointer (renderer);
-		val_gc (handle, gc_renderer);
-		return handle;
+		return CFFIPointer (renderer, gc_renderer);
 		
 	}
 	
@@ -984,6 +1041,14 @@ namespace lime {
 		
 		Renderer* targetRenderer = (Renderer*)val_data (renderer);
 		return (intptr_t)targetRenderer->GetContext ();
+		
+	}
+	
+	
+	double lime_renderer_get_scale (value renderer) {
+		
+		Renderer* targetRenderer = (Renderer*)val_data (renderer);
+		return targetRenderer->GetScale ();
 		
 	}
 	
@@ -1026,6 +1091,13 @@ namespace lime {
 	}
 	
 	
+	bool lime_system_get_allow_screen_timeout () {
+		
+		return System::GetAllowScreenTimeout ();
+		
+	}
+	
+	
 	value lime_system_get_directory (int type, HxString company, HxString title) {
 		
 		const char* path = System::GetDirectory ((SystemDirectory)type, company.__s, title.__s);
@@ -1055,6 +1127,13 @@ namespace lime {
 	}
 	
 	
+	bool lime_system_set_allow_screen_timeout (bool allow) {
+		
+		return System::SetAllowScreenTimeout (allow);
+		
+	}
+	
+	
 	void lime_text_event_manager_register (value callback, value eventObject) {
 		
 		TextEvent::callback = new AutoGCRoot (callback);
@@ -1068,9 +1147,7 @@ namespace lime {
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
 		
 		TextLayout *text = new TextLayout (direction, script.__s, language.__s);
-		value handle = cffi::alloc_pointer (text);
-		val_gc (handle, gc_text_layout);
-		return handle;
+		return CFFIPointer (text, gc_text_layout);
 		
 		#else
 		
@@ -1155,9 +1232,7 @@ namespace lime {
 	value lime_window_create (value application, int width, int height, int flags, HxString title) {
 		
 		Window* window = CreateWindow ((Application*)val_data (application), width, height, flags, title.__s);
-		value handle = cffi::alloc_pointer (window);
-		val_gc (handle, gc_window);
-		return handle;
+		return CFFIPointer (window, gc_window);
 		
 	}
 	
@@ -1295,6 +1370,7 @@ namespace lime {
 	DEFINE_PRIME2 (lime_bytes_from_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_get_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_read_file);
+	DEFINE_PRIME1 (lime_cffi_get_native_pointer);
 	DEFINE_PRIME1 (lime_cffi_set_finalizer);
 	DEFINE_PRIME0 (lime_clipboard_get_text);
 	DEFINE_PRIME1v (lime_clipboard_set_text);
@@ -1336,6 +1412,13 @@ namespace lime {
 	DEFINE_PRIME3 (lime_image_encode);
 	DEFINE_PRIME1 (lime_image_load);
 	DEFINE_PRIME0 (lime_jni_getenv);
+	DEFINE_PRIME2v (lime_joystick_event_manager_register);
+	DEFINE_PRIME1 (lime_joystick_get_device_guid);
+	DEFINE_PRIME1 (lime_joystick_get_device_name);
+	DEFINE_PRIME1 (lime_joystick_get_num_axes);
+	DEFINE_PRIME1 (lime_joystick_get_num_buttons);
+	DEFINE_PRIME1 (lime_joystick_get_num_hats);
+	DEFINE_PRIME1 (lime_joystick_get_num_trackballs);
 	DEFINE_PRIME2 (lime_jpeg_decode_bytes);
 	DEFINE_PRIME2 (lime_jpeg_decode_file);
 	DEFINE_PRIME2v (lime_key_event_manager_register);
@@ -1353,16 +1436,19 @@ namespace lime {
 	DEFINE_PRIME1 (lime_renderer_create);
 	DEFINE_PRIME1v (lime_renderer_flip);
 	DEFINE_PRIME1 (lime_renderer_get_context);
+	DEFINE_PRIME1 (lime_renderer_get_scale);
 	DEFINE_PRIME1 (lime_renderer_get_type);
 	DEFINE_PRIME1 (lime_renderer_lock);
 	DEFINE_PRIME1v (lime_renderer_make_current);
 	DEFINE_PRIME1v (lime_renderer_unlock);
 	DEFINE_PRIME2v (lime_render_event_manager_register);
 	DEFINE_PRIME2v (lime_sensor_event_manager_register);
+	DEFINE_PRIME0 (lime_system_get_allow_screen_timeout);
 	DEFINE_PRIME3 (lime_system_get_directory);
 	DEFINE_PRIME1 (lime_system_get_display);
 	DEFINE_PRIME0 (lime_system_get_num_displays);
 	DEFINE_PRIME0 (lime_system_get_timer);
+	DEFINE_PRIME1 (lime_system_set_allow_screen_timeout);
 	DEFINE_PRIME2v (lime_text_event_manager_register);
 	DEFINE_PRIME3 (lime_text_layout_create);
 	DEFINE_PRIME5 (lime_text_layout_position);

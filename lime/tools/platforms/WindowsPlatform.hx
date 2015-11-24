@@ -19,6 +19,7 @@ import lime.project.Asset;
 import lime.project.AssetType;
 import lime.project.Haxelib;
 import lime.project.HXProject;
+import lime.project.Platform;
 import lime.project.PlatformTarget;
 import sys.io.File;
 import sys.FileSystem;
@@ -132,6 +133,8 @@ class WindowsPlatform extends PlatformTarget {
 			var haxeArgs = [ hxml ];
 			var flags = [];
 			
+			flags.push ("-DHXCPP_M32");
+			
 			if (!project.environment.exists ("SHOW_CONSOLE")) {
 				
 				haxeArgs.push ("-D");
@@ -159,7 +162,7 @@ class WindowsPlatform extends PlatformTarget {
 			
 			var iconPath = PathHelper.combine (applicationDirectory, "icon.ico");
 			
-			if (IconHelper.createWindowsIcon (icons, iconPath) && PlatformHelper.hostPlatform == WINDOWS) {
+			if (IconHelper.createWindowsIcon (icons, iconPath) && PlatformHelper.hostPlatform == Platform.WINDOWS) {
 				
 				var templates = [ PathHelper.getHaxelib (new Haxelib ("lime")) + "/templates" ].concat (project.templatePaths);
 				ProcessHelper.runCommand ("", PathHelper.findTemplate (templates, "bin/ReplaceVistaIcon.exe"), [ executablePath, iconPath, "1" ], true, true);
@@ -271,6 +274,19 @@ class WindowsPlatform extends PlatformTarget {
 		if (project.targetFlags.exists ("xml")) {
 			
 			project.haxeflags.push ("-xml " + targetDirectory + "/types.xml");
+			
+		}
+		
+		for (asset in project.assets) {
+			
+			if (asset.embed && asset.sourcePath == "") {
+				
+				var path = PathHelper.combine (targetDirectory + "/obj/tmp", asset.targetPath);
+				PathHelper.mkdir (Path.directory (path));
+				FileHelper.copyAsset (asset, path);
+				asset.sourcePath = path;
+				
+			}
 			
 		}
 		

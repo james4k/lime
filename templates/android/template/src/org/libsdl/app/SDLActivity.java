@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 
 import android.app.*;
 import android.content.*;
+import android.text.InputType;
 import android.view.*;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
@@ -673,7 +674,7 @@ public class SDLActivity extends Activity {
         }
     }
 
-    // APK extension files support
+    // APK expansion files support
 
     /** com.android.vending.expansion.zipfile.ZipResourceFile object or null. */
     private Object expansionFile;
@@ -682,16 +683,25 @@ public class SDLActivity extends Activity {
     private Method expansionFileMethod;
 
     /**
+     * This method was called by SDL using JNI.
+     * @deprecated because of an incorrect name
+     */
+    @Deprecated
+    public InputStream openAPKExtensionInputStream(String fileName) throws IOException {
+        return openAPKExpansionInputStream(fileName);
+    }
+
+    /**
      * This method is called by SDL using JNI.
      */
-    public InputStream openAPKExtensionInputStream(String fileName) throws IOException {
+    public InputStream openAPKExpansionInputStream(String fileName) throws IOException {
         // Get a ZipResourceFile representing a merger of both the main and patch files
         if (expansionFile == null) {
             Integer mainVersion = Integer.valueOf(nativeGetHint("SDL_ANDROID_APK_EXPANSION_MAIN_FILE_VERSION"));
             Integer patchVersion = Integer.valueOf(nativeGetHint("SDL_ANDROID_APK_EXPANSION_PATCH_FILE_VERSION"));
 
             try {
-                // To avoid direct dependency on Google APK extension library that is
+                // To avoid direct dependency on Google APK expansion library that is
                 // not a part of Android SDK we access it using reflection
                 expansionFile = Class.forName("com.android.vending.expansion.zipfile.APKExpansionSupport")
                     .getMethod("getAPKExpansionZipFile", Context.class, int.class, int.class)
@@ -1141,11 +1151,6 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         }
     }
 
-    // unused
-    @Override
-    public void onDraw(Canvas canvas) {}
-
-
     // Key events
     @Override
     public boolean onKey(View  v, int keyCode, KeyEvent event) {
@@ -1382,6 +1387,7 @@ class DummyEdit extends View implements View.OnKeyListener {
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
         ic = new SDLInputConnection(this, true);
 
+        outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI
                 | 33554432 /* API 11: EditorInfo.IME_FLAG_NO_FULLSCREEN */;
 

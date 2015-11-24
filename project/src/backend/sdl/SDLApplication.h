@@ -8,6 +8,7 @@
 #include <graphics/RenderEvent.h>
 #include <system/SensorEvent.h>
 #include <ui/GamepadEvent.h>
+#include <ui/JoystickEvent.h>
 #include <ui/KeyEvent.h>
 #include <ui/MouseEvent.h>
 #include <ui/TextEvent.h>
@@ -38,12 +39,14 @@ namespace lime {
 			
 			void HandleEvent (SDL_Event* event);
 			void ProcessGamepadEvent (SDL_Event* event);
+			void ProcessJoystickEvent (SDL_Event* event);
 			void ProcessKeyEvent (SDL_Event* event);
 			void ProcessMouseEvent (SDL_Event* event);
 			void ProcessSensorEvent (SDL_Event* event);
 			void ProcessTextEvent (SDL_Event* event);
 			void ProcessTouchEvent (SDL_Event* event);
 			void ProcessWindowEvent (SDL_Event* event);
+			int WaitEvent (SDL_Event* event);
 			
 			static void UpdateFrame ();
 			static void UpdateFrame (void*);
@@ -55,6 +58,7 @@ namespace lime {
 			Uint32 currentUpdate;
 			double framePeriod;
 			GamepadEvent gamepadEvent;
+			JoystickEvent joystickEvent;
 			KeyEvent keyEvent;
 			Uint32 lastUpdate;
 			MouseEvent mouseEvent;

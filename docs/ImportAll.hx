@@ -93,12 +93,6 @@ import lime.net.oauth.OAuthVersion;
 //import lime.net.NetConnection;
 //import lime.net.NetConnectionManager;
 import lime.net.URIParser;
-import lime.net.URLLoader;
-import lime.net.URLLoaderDataFormat;
-import lime.net.URLRequest;
-import lime.net.URLRequestHeader;
-import lime.net.URLRequestMethod;
-import lime.net.URLVariables;
 #if (windows || mac || linux || neko)
 import lime.project.ApplicationData;
 import lime.project.Architecture;
@@ -178,6 +172,7 @@ import lime.tools.platforms.IOSPlatform;
 import lime.tools.platforms.LinuxPlatform;
 import lime.tools.platforms.MacPlatform;
 import lime.tools.platforms.TizenPlatform;
+import lime.tools.platforms.TVOSPlatform;
 import lime.tools.platforms.WebOSPlatform;
 import lime.tools.platforms.WindowsPlatform;
 #end
