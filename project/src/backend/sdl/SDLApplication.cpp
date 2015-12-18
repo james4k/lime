@@ -29,6 +29,8 @@ namespace lime {
 			
 		}
 		
+		SDL_LogSetPriority (SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_WARN);
+		
 		currentApplication = this;
 		
 		framePeriod = 1000.0 / 60.0;
@@ -426,7 +428,7 @@ namespace lime {
 					if (SDLJoystick::Connect (event->jdevice.which)) {
 						
 						joystickEvent.type = JOYSTICK_CONNECT;
-						joystickEvent.id = event->jdevice.which;
+						joystickEvent.id = SDLJoystick::GetInstanceID (event->jdevice.which);
 						
 						JoystickEvent::Dispatch (&joystickEvent);
 						

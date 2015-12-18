@@ -901,7 +901,7 @@ class Image {
 						var srcData:ByteArray = bytes.getData ();
 						byteArray = new ByteArray ();
 						#if flash
-						@:privateAccess byteArray.length = srcData.length;
+						byteArray.length = srcData.length;
 						#end
 						
 						var color:BGRA;
@@ -922,7 +922,7 @@ class Image {
 						var srcData = bytes.getData ();
 						byteArray = new ByteArray ();
 						#if flash
-						@:privateAccess byteArray.length = srcData.length;
+						byteArray.length = srcData.length;
 						#end
 						
 						var color:RGBA;
@@ -1026,6 +1026,7 @@ class Image {
 		
 		#if (js && html5)
 		var image = new JSImage ();
+		image.crossOrigin = "Anonymous";
 		
 		var image_onLoaded = function (event) {
 			
@@ -1112,6 +1113,7 @@ class Image {
 		#if (js && html5)
 			
 			var image = new JSImage ();
+			image.crossOrigin = "Anonymous";
 			
 			image.onload = function (_) {
 				

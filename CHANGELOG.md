@@ -1,3 +1,45 @@
+2.8.2 (12/16/2015)
+------------------
+
+* Enabled WebGL by default on HTML5
+* Added support for Lime event canceling
+* Added default keyboard shortcuts for toggling fullscreen
+* Added default Android back button behavior to quit
+* Added support for <window resizable="false" /> on HTML5 template
+* Changed iOS default system font path to be more generic
+* Fixed issues with OGG decoding on newer Android NDK
+* Fixed AudioSource complete event when setting currentTime or length
+* Fixed minor issue compiling Neko Windows binaries from Linux
+* Minor updates to the default Android ADB output filter
+* Updated ANGLE binaries to resolve ALT + Enter fullscreen issue
+* Fixed font paths on iOS (legacy)
+
+
+2.8.1 (12/09/2015)
+------------------
+
+* Disable ANGLE by default on Windows, need to do additional testing
+* Added support for optional haxelib references in XML
+* Fixed an issue with incorrect joystick IDs on connect
+
+
+2.8.0 (12/07/2015)
+------------------
+
+* Removed lime.utils.ByteArray in favor of Haxe (3.2+) Bytes
+* Enabled ANGLE on Windows builds by default
+* Restored compatibility with Windows XP
+* Added support for HTML5 gamepad/joystick events
+* Removed lime.net.URLLoader, added HTTPRequest as a temporary patch
+* Added cache-break support to HTML5 based on each build
+* Fixed use of 32-bit Windows builds on recent HXCPP versions
+* Fixed support for correct touch event coordinates in HTML5 fullscreen
+* Fixed importing of lime.system.JNI on platforms other than Android
+* Fixed an issue that could cause native crashes on null Vector2 values
+* Fixed embed of runtime-generate asset files
+* Fixed default font paths on new versions of iOS (legacy)
+
+
 2.7.0 (10/28/2015)
 ------------------
 
