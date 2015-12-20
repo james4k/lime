@@ -1049,11 +1049,7 @@ class AssetCache {
 	
 	
 	public var audio:Map<String, AudioBuffer>;
-	#if lime_console
-	public var enabled:Bool = false;
-	#else
 	public var enabled:Bool = true;
-	#end
 	public var image:Map<String, Image>;
 	public var font:Map<String, Dynamic /*Font*/>;
 	public var version:Int;
