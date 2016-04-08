@@ -164,7 +164,8 @@ namespace lime {
 			
 		} else {
 			
-			bytes = Bytes (data);
+			bytes = Bytes();
+			bytes.Set(data);
 			resource = Resource (&bytes);
 			
 		}
@@ -1201,7 +1202,19 @@ namespace lime {
 		if (path) {
 			
 			value _path = alloc_string (path);
-			free ((char*) path);
+			
+			if (type != 4) {
+				
+				// TODO: Make this more consistent
+				
+				//This free() causes crashes on mac at least. Commenting it out makes it work
+				//again but may cause a small memory leak. Some more consideration is
+				//necessary to figure out what to do here
+				
+				//free ((char*) path);
+				
+			}
+			
 			return _path;
 			
 		} else {
