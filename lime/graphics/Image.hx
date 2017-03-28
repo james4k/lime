@@ -1224,7 +1224,9 @@ class Image {
 			
 			#if lime_console
 			
+			cpp.vm.Gc.enterGCFreeZone ();
 			var td = TextureData.fromFile (path);
+			cpp.vm.Gc.exitGCFreeZone ();
 			
 			if (td.valid) {
 				
@@ -1237,18 +1239,10 @@ class Image {
 				var size = w * h * 4;
 				cpp.NativeArray.setSize (data, size);
 				
+				cpp.vm.Gc.enterGCFreeZone ();
 				td.decode (cpp.Pointer.arrayElem (data, 0), size);
-				/*
-				{
-					var dest:cpp.Pointer<cpp.UInt32> = cast cpp.Pointer.arrayElem (data, 0);	
-					var src:cpp.Pointer<cpp.UInt32> = cast td.pointer;	
-					var n = w * h;
-					for (i in 0...n) {
-						dest[i] = src[i];
-					}
-				}
-				*/
 				td.release ();
+				cpp.vm.Gc.exitGCFreeZone ();
 				
 				#else
 				
